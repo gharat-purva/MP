@@ -1,0 +1,223 @@
+.MODEL SMALL
+.STACK
+.DATA
+    M1 DB 10,13,"MOUSE DRIVER PRESENT$"
+    
+.CODE
+    DISP MACRO XX
+        MOV AH,09
+        LEA DX,XX
+        INT 21H
+    ENDM
+    
+.STARTUP
+    MOV AX,0000 
+    INT 33H
+    CMP AX,0
+    JE LAST
+    
+    DISP M1
+    MOV AX,0004H
+    MOV CX,0000H 
+    MOV DX,0000H 
+    INT 33H
+    
+    MOV AX,0007H 
+    MOV CX,0000 
+    MOV DX,00FFH 
+    INT 33H
+    
+    MOV AX,0008H 
+    MOV CX,0000 
+    MOV DX,00FFH
+    INT 33H
+    
+    P:
+        MOV AX,0001H
+        INT 33H
+        
+        MOV AX,0003H
+        INT 33H
+        
+        CMP BX,01
+        JE LEFT
+        JMP RIGHT
+
+    LEFT:
+        MOV AX,0011H 
+        INT 10H
+        
+        MOV AH,0CH 
+        INT 10H
+   
+    RIGHT:
+        MOV AX,0001H
+        INT 33H
+        
+        CMP BX,02
+        JE LAST
+        JMP P
+
+    LAST:
+        MOV AX,0000 
+        INT 10H
+.EXIT 
+ENDv
+
+
+
+
+
+
+
+
+Theory:
+Interface mouse using Int 33H
+Int 33h MS Mouse Interrupt
+Function 0 Reset
+Input
+AX = 0
+Output
+AX = mouse status -1 = installed
+0 = not installed
+BX = number of buttons
+Function 1 Show Mouse Cursor
+Input
+AX = 1
+Output
+NONE
+Function 2 Hide Mouse Cursor
+Input
+AX = 2
+Output
+NONE
+Function 3 Get Mouse Position &amp; Button Status
+Input
+AX = 3
+Output
+BX = Button Status
+xxxx xxxx xxxx xMRL
+M=middle (if present) R=right L=left
+0= not pressed 1 = pressed
+CX = Horizontal Mouse Cursor Position
+DX = Vertical Mouse Cursor Position
+(div positions by 2 for med res
+
+graphics; div by 8 for text mode)
+Function 4 Set Mouse Cursor Position
+Input
+AX = 4
+CX = new horizontal cursor position
+DX = new vertical cursor position
+Output
+NONE
+Function 5 Get Button Press Information
+Input
+AX = 5
+BX = button of interest (0=L; 1=R; 2=M)
+Output
+AX = button status (current status of ALL buttons)
+BX = number of buutton presses on specified button
+CX = horizontal position at last press
+DX = vertical position at last press
+Function 6 Get Button Release Information
+Input
+AX = 6
+BX = button of interest (0=L; 1=R; 2=M)
+Output
+AX = button status (current status of ALL buttons)
+BX = number of buutton presses on specified button
+CX = horizontal position at last release
+DX = vertical position at last release
+
+Function 7 Set Minimum and Maximum X Position
+Input
+AX = 7
+CX = new minimum horizontal cursor position
+DX = new maximum horizontal cursor position
+Output
+NONE
+
+Function 8 Set Minimum and Maximum Y Position
+Input
+AX = 8
+CX = new minimum vertical cursor position
+DX = new maximum vertical cursor position
+Output
+NONE
+Function 9 Define Graphics Cursor
+Input
+AX = 9
+BX = horizontal cursor hot spot (0,0) upper left
+CX = vertical cursor hot spot
+ES:DX = address of screen and cursor mask
+Output
+NONE
+
+Application: Use of Int 33 H to interface mouse with system.
+Program and Output:
+
+.MODEL SMALL
+.STACK
+.DATA
+    M1 DB 10,13,&quot;MOUSE DRIVER PRESENT$&quot;
+    
+.CODE
+    DISP MACRO XX
+        MOV AH,09
+        LEA DX,XX
+        INT 21H
+    ENDM
+    
+.STARTUP
+    MOV AX,0000 
+    INT 33H
+    CMP AX,0
+    JE LAST
+    
+    DISP M1
+    MOV AX,0004H
+
+    MOV CX,0000H 
+    MOV DX,0000H 
+    INT 33H
+    
+    MOV AX,0007H 
+    MOV CX,0000 
+    MOV DX,00FFH 
+    INT 33H
+    
+    MOV AX,0008H 
+    MOV CX,0000 
+    MOV DX,00FFH
+    INT 33H
+    
+    P:
+        MOV AX,0001H
+        INT 33H
+        
+        MOV AX,0003H
+        INT 33H
+        
+        CMP BX,01
+        JE LEFT
+        JMP RIGHT
+    LEFT:
+        MOV AX,0011H 
+        INT 10H
+        
+        MOV AH,0CH 
+        INT 10H
+   
+    RIGHT:
+        MOV AX,0001H
+        INT 33H
+        
+        CMP BX,02
+        JE LAST
+        JMP P
+    LAST:
+        MOV AX,0000 
+        INT 10H
+.EXIT 
+END

@@ -1,0 +1,235 @@
+***Hex to bcd***:
+
+.model small
+.data
+hex dw 0ach
+counter db 0
+.code
+mov ax,@DATA
+mov DS,ax
+mov ax,hex
+mov bx,000Ah
+L:
+inc counter
+div bx
+push dx
+cmp ax,0
+mov dx,00h
+je exit
+jmp L
+exit:
+mov cl,counter
+mov ch,00h
+L1:
+pop dx
+add dl,30h
+mov ah,02h
+int 21h
+LOOP L1
+mov ah,4ch
+int 21h
+ret
+end
+
+***bcd to hex****:
+
+.MODEL SMALL
+.STACK 00100H
+
+.DATA
+
+MSG1 DB 00DH, 00AH, "Enter the 2 digit BCD number: $"
+MSG2 DB 00DH, 00AH, "The equivalent HEX number is: $"
+
+NR DB 10
+
+.CODE
+
+    MAIN PROC
+MOV AX, @DATA
+MOV DS, AX
+LEA DX, [MSG1]
+MOV AH, 009H
+INT 021H 
+
+MOV AH, 001H
+INT 021H 
+
+AND AL, 00FH
+MUL BYTE PTR [NR]
+MOV [NR], AL
+MOV AH, 001H
+INT 021H    
+
+CMP AL, 00DH
+JE EXIT  
+
+AND AL, 00FH
+ADD [NR], AL
+LEA DX, [MSG2]
+MOV AH, 009H
+INT 021H    
+
+MOV DL, [NR]
+PUSH DX
+MOV CL, 004H
+SHR DL, CL
+OR DL, 030H
+MOV AH, 002H
+INT 021H    
+
+POP DX
+AND DL, 00FH
+OR DL, 030H
+CMP DL, 03AH
+JB NEXT     
+
+ADD DL, 007H 
+
+NEXT:
+MOV AH, 002H
+INT 021H
+JMP SHORT EXIT1
+
+EXIT:
+LEA DX, [MSG2]
+MOV AH, 009H
+INT 021H 
+
+MOV AL, [NR]
+CBW
+MOV CL, 10
+DIV CL
+XCHG DX, AX
+OR DL, 030H
+MOV AH, 002H
+INT 021H 
+
+EXIT1:
+MOV AH, 04CH
+INT 021H
+
+MAIN ENDP
+
+END MAIN
+
+
+
+
+
+
+
+
+
+
+
+
+Theory:
+Software Architecture / Register Set/ Programmer’s model of Intel 8086
+Microprocessor:
+
+ 
+GENERAL PURPOSE REGISTERS
+8086 CPU has 8 general purpose registers, each register has its own name:
+AX - the accumulator register (divided into AH / AL):
+1. Generates shortest machine code
+2. Arithmetic, logic and data transfer
+3. One number must be in AL or AX
+4. Multiplication &amp; Division
+5. Input &amp; Output
+ 
+BX - the base address register (divided into BH / BL).
+ 
+
+CX - the count register (divided into CH / CL):
+1. Iterative code segments using the LOOP instruction
+2. Repetitive operations on strings with the REP command
+3. Count (in CL) of bits to shift and rotate
+ 
+DX - the data register (divided into DH / DL):
+1. DX:AX concatenated into 32-bit register for some MUL and DIV operations
+2. Specifying ports in some IN and OUT operations
+ 
+SI - source index register:
+1. Can be used for pointer addressing of data
+2. Used as source in some string processing instructions
+3. Offset address relative to DS
+ 
+DI - destination index register:
+1. Can be used for pointer addressing of data
+2. Used as destination in some string processing instructions
+3. Offset address relative to ES
+ 
+BP - base pointer:
+1. Primarily used to access parameters passed via the stack
+2. Offset address relative to SS
+SP - stack pointer:
+1. Always points to top item on the stack
+2. Offset address relative to SS
+3. Always points to word (byte at even address)
+4. An empty stack will had SP = FFFEh
+ SEGMENT REGISTERS
+CS - points at the segment containing the current program.
+DS - generally points at segment where variables are defined.
+ES - extra segment register, it&#39;s up to a coder to define its usage.
+SS - points at the segment containing the stack.
+ Flag Register of 8086:
+
+- A flag is a flip-flop which indicates some condition produced by the
+execution of an instruction or controls certain operations of the EU.
+
+- The Flag Register is a special register associated with the ALU.
+- A 16-bit flag register in the EU contains nine active flags.
+- Fig. shows the location of the nine flags in the flag register
+
+Fig. 1.4 Flag Register structure
+
+Flags is a 16-bit register containing 9 1-bit flags:
+ Overflow Flag (OF) - set if the result is too large positive number, or is too small
+negative number to fit into destination operand.
+ Direction Flag (DF) - if set then string manipulation instructions will auto-
+decrement index registers. If cleared then the index registers will be auto-
+incremented.
+ Interrupt-enable Flag (IF) - setting this bit enables maskable interrupts.
+ Single-step Flag (TF) - if set then single-step interrupt will occur after the next
+instruction.
+ Sign Flag (SF) - set if the most significant bit of the result is set.
+ Zero Flag (ZF) - set if the result is zero.
+ Auxiliary carry Flag (AF) - set if there was a carry from or borrow to bits 0-3 in the
+AL register.
+ Parity Flag (PF) - set if parity (the number of &quot;1&quot; bits) in the low-order byte of the
+result is even.
+ Carry Flag (CF) - set if there was a carry from or borrow to the most significant bit
+
+during last result calculation.
+Procedure to Convert 4 digit Hex number to its equivalent BCD number.
+We have a 4 digit Hex number whose equivalent binary number is to be found.i.e. FFFF H. Initially we
+compare FFFF H with decimal 10000 (2710 H in Hex ). If number is greater than 10,000 we add it to DH
+register. Also, we subtract decimal 10,000 from FFFF H, each time comparison is made. Then we
+compare the number obtained in AX by 1000 decimal. Each time we subtract 1000 decimal from AX and
+add 1000 decimal to BX. Then we compare number obtained in AX by 100 decimals. Each time we
+subtract 100 decimal from AX and add 100 decimal to BX to obtain BCD equivalent. Then we compare
+number obtained in AX with 10 decimal. Each time we subtract 10 decimal from AX and we add 10
+decimal to BX. Finally we add the result in BX with remainder in AX. The final result is present in
+register DH with contains the 5th bit if present and register AX. Display the result.
+Algorithm:
+Step I: Initialize the data segment.
+Step II: Initialize BX = 0000 H and DH = 00H.
+Step III: Load the number in AX.
+Step IV: Compare number with 10000 decimal. If below goto step VII else goto
+Step V.
+Step V: Subtract 10,000 decimal from AX and add 1 decimal to DH
+Step VI: Jump to step IV.
+Step VII: Compare number in AX with 1000, if below goto step X else goto
+Step VIII.
+Step VIII: Subtract 1000 decimal from AX and add 1000 decimal to BX.
+Step IX: Jump to step VII.
+Step X: Compare the number in AX with 100 decimal if below goto step XIII
+Step XI: Subtract 100 decimal from AX and add 100 decimal to BX.
+Step XII: Jump to step X
+Step XIII: Compare number in AX with 10. If below goto step XVI
+Step XIV: Subtract 10 decimal from AX and add 10 decimal to BX.
+Step XV: Jump to step XIII.
+Step XVI: Add remainder in AX with result in BX.
+Step XVII: Display the result in DH and BX.
+Step XVIII: Stop.

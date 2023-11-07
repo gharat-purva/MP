@@ -1,0 +1,50 @@
+#include <stdio.h>
+#include <conio.h>
+
+int main() {
+    int a, b, c;
+    clrscr();
+    printf("Enter the first number: ");
+    scanf("%d", &a);
+    printf("Enter the second number: ");
+    scanf("%d", &b);
+
+    // Addition using inline Assembly
+    asm {
+        mov ax, a
+        mov bx, b
+        add ax, bx
+        mov c, ax
+    }
+    printf("\nThe addition of %d and %d is %d", a, b, c);
+
+    // Subtraction using inline Assembly
+    asm {
+        mov ax, a
+        mov bx, b
+        sub ax, bx
+        mov c, ax
+    }
+    printf("\nThe subtraction of %d and %d is %d", a, b, c);
+
+    // Multiplication using inline Assembly
+    asm {
+        mov ax, a
+        mov bx,b
+        mul bx
+        mov c, ax
+    }
+    printf("\nThe multiplication of %d and %d is %d", a, b, c);
+
+    // Division using inline Assembly
+    asm {
+        mov ax, a
+        mov bx,b
+        div bx
+        mov c, ax
+    }
+    printf("\nThe division of %d by %d is %d", a, b, c);
+
+    getch();
+    return 0;
+}

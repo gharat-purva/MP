@@ -1,0 +1,148 @@
+**8 bit number**:
+
+.model small
+.data
+msg1 db 10,13, "enter 8 bit no:$" 
+msg2 db 10,13,"8 bit no is :$"
+.code
+.startup
+mov ah,09h
+lea dx,msg1
+int 21h 
+
+mov ah,01h
+int 21h
+
+sub al,30h
+mov cl,04h
+shl al,cl 
+
+mov bl,al
+mov ah,01h
+int 21h
+
+sub al,30h
+add al,bl 
+mov bh,al
+mov ah, 09h
+lea dx,msg2
+int 21h  
+
+mov bl,bh 
+and bl,0f0h
+shr bl,cl 
+add bl,30h
+mov dl,bl 
+mov ah,02h
+int 21h 
+
+mov bl,bh 
+and bl,0fh
+add bl,30h
+mov dl,bl
+mov ah,02h
+int 21h
+.exit 
+end
+
+
+
+
+
+
+Theory:
+Assembler Directives:-
+This type of statements includes commands that are addressed to the assembler, such as:
+Constant and variable definition.
+Allocation of memory space and initialization of memory, and
+Control of the assembly process
+List of assembler directives
+a. Data Allocation Directives
+DB…………..define byte
+DW………….define word (2 bytes)
+DD………….define double word (4 bytes)
+DQ………….define quadword (8 bytes)
+DT…………..define tenbytes
+EQU…………equate, assign numeric expression to a name
+Examples:3
+db 100 dup (?) define 100 bytes, with no initial values for bytes
+db “Hello” define 5 bytes, ASCII equivalent of “Hello”.
+maxint equ 327673
+count equ 10 * 20 ; calculate a value (200)
+ENDS…………used to indicate the end of the segment.
+END…………. used to indicate the end of program.
+PROC……........used to indicate the beginning of a procedure.
+ENDP……….. .used to indicate the end of a program.
+ENDM………. used to indicate the end of a program.
+SEGMENT…...used to indicate the start of the segment.
+TITLE…………used to indicate the title of the program.
+EQU …………..used to give a name to some value or to a symbol. Each time the assembler
+finds the name in the program, it will replace the name with the value or symbol you given to
+that name.
+ASSUME…….. Associates a logical segment to processor segment.
+e.g. Example:
+ASSUME CS:CODE ;
+TASM COMMANDS:
+C :/&gt;cd foldername
+C:/foldername&gt;edit filename.asm
+
+After this command executed in command prompt an editor window will open. Program
+should be typed in this window and saved. The program structure is given below.
+Structure of Program:
+.model tiny/small/medium/large
+.Stack &lt;some number&gt;
+.data
+; Initialize data
+; which is used in program.
+.code
+.startup
+; Program logic goes here.
+.exit
+end
+To run the program, the following steps have to be followed:
+C:/foldername&gt;Tasm filename.asm
+After this command is executed in command prompt if there are no errors in program
+regarding to syntax the assembler will generates an object module as discuss above.
+C:/foldername&gt;Tlink filename.obj
+After verifying the program for correct syntax and the generated object files should be
+linked together. For this the above link command should be executed and it will give an EXE file
+if the model directive is small as discuss above.
+C:/foldername&gt;td filename.exe
+After generating EXE file by the assembler it’s the time to check the output. For this the
+above command is used and the execution of the program can be done in different ways. It is as
+shown below:
+__ g ; complete execution of program in single step.
+__ t ; Stepwise execution.
+__d ds: starting address or ending address ; To see data in memory locations
+__p; Used to execute interrupt or procedure during stepwise execution of program
+__ q ; To quit the execution.
+5. Procedure/ Algorithm
+
+Program to accept 8 bit number and display 8 bit number
+Explanation: Conversions from ASCII to binary usually start with keyboard data entry. If a
+single key is typed the conversion is accomplished by subtracting a 30H from the number. If
+more than one key is typed, conversion from ASCII to binary still requires that 30H be
+subtracted, but there is one additional step. After subtracting 30H, the prior result is first
+multiplied by 10, the number is added to the result. The algorithm used to convert ASCII to
+binary is:
+1. Begin with a binary result of 0.
+2. Subtract 30H from the character typed on the keyboard to convert it to BCD.
+3. Multiply the binary result by 10 and add the new BCD digit.
+4. Repeat steps 2 and 3 until the character typed is not an ASCII coded number of 30H-
+39H.
+
+Functions and Interrupts:
+1. Display message on screen.
+Mov ah,09
+Lea dx, msg
+Int 21h
+2. Enter single char from user.
+Mov Ah,01
+Int 21h
+Return : AL= ASCII value
+3. Display single char on screen.
+Mov Ah,02
+Int 21h
+Application:
+1. Conversion from ASCII to BCD
+2. Conversion from BCD to ASCII
